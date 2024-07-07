@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VND to AUD and NZD Conversion</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>VND to AUD and NZD Conversion</h1>
+    <canvas id="conversionChart" width="400" height="200"></canvas>
+
+    <script>
+        // Function to fetch exchange rates
+        async function getExchangeRates() {
+            const response = await fetch('https://api.exchangerate-api.com/v4/latest/VND');
+            const data = await response.json();
+            return {
+                AUD: data.rates.AUD,
+                NZD: data.rates.NZD
+            };
+        }
+
+        // Function to generate data and update chart
+        async function generateChart() {
+            const rates = await getExchangeRates();
+            const amounts = [1, 10, 100, 1000, 10000, 100000, 1000000];
+            const audAmounts = amounts.map(amount => amount * rates.AUD);
+            const nzdAmounts = amounts.map(amount => amount * rates.NZD);
+
+            const ctx = document.getElementById('conversionChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: amounts,
+                    datasets: [
+                        {
+                            label: 'AUD',
+                            data: audAmounts,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            fill: false
+                        },
+                        {
+                            label: 'NZD',
+                            data: nzdAmounts,
+                            borderColor: 'rgba(153, 102, 255, 1)',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Amount in VND'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Equivalent in AUD/NZD'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Generate chart on page load
+        generateChart();
+    </script>
+</body>
+</html>
